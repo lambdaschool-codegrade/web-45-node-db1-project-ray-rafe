@@ -3,6 +3,7 @@ const md = require("./accounts-middleware");
 const Account = require("./accounts-model");
 
 router.get("/", async (req, res, next) => {
+  // DO YOUR MAGIC
   try {
     const accounts = await Account.getAll();
     res.json(accounts);
@@ -12,6 +13,7 @@ router.get("/", async (req, res, next) => {
 });
 
 router.get("/:id", md.checkAccountId, async (req, res, next) => {
+  //eslint-disable-line
   res.json(req.account);
 });
 
@@ -22,7 +24,10 @@ router.post(
   async (req, res, next) => {
     // DO YOUR MAGIC
     try {
-      const newAccount = await Account.create(req.body);
+      const newAccount = await Account.create({
+        name: req.body.name.trim(),
+        budget: req.body.budget,
+      });
       res.status(201).json(newAccount);
     } catch (err) {
       next(err);
@@ -35,10 +40,9 @@ router.put(
   md.checkAccountId,
   md.checkAccountPayload,
   async (req, res, next) => {
-    const updated = await Account.updateById(req.params.id, req.body);
-    res.json(updated);
     try {
-      res.json("update account");
+      const updated = await Account.updateById(req.params.id, req.body);
+      res.json(updated);
     } catch (err) {
       next(err);
     }
@@ -56,7 +60,7 @@ router.delete("/:id", md.checkAccountId, async (req, res, next) => {
 });
 
 router.use((err, req, res, next) => {
-  // eslint-disable-line
+  //eslint-disable-line
   res.status(err.status || 500).json({
     message: err.message,
   });
